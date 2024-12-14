@@ -23,7 +23,6 @@ const sql = `select * from ev_users where username=?`
 db.query(sql, [userinfo.username], function (err, results) {
   // 执行 SQL 语句失败
   if (err) {
-    debugger
     return res.send({ status: 1, message: err.message }) 
   }
 
@@ -35,9 +34,27 @@ db.query(sql, [userinfo.username], function (err, results) {
 
   // TODO: 用户名可用，继续后续流程...
   userinfo.password = bcrypt.hashSync(userinfo.password, 10)
+  //1.要插入的数据
+const user = {username:userinfo.username,password:userinfo.password}
+//2.执行的sql语句  其中 ? 表示占位符
+const sqlstr = 'INSERT INTO ev_users SET ?'
 
+console.log("🚀 ~ userinfo.password:", userinfo.password)
+
+//1.要插入的数据
+
+db.query(sql, user, function (err, results) {
+// 执行 SQL 语句失败
+if (err) return res.send({ status: 1, message: err.message })
+// SQL 语句执行成功，但影响行数不为 1
+if (results.affectedRows !== 1)  return res.send({ status: 1, message: '注册用户失败，请稍后再试！' })
+
+// 注册成功
+res.send({ status: 0, message: '注册成功！' })
 })
-  // res.send({ status: 0, message: '注册成功' })
+})
+
+
 
   }
   
